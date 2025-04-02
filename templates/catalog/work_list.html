@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Works{% endblock %}
+
+{% block content %}
+  <h2 class="mb-4">Browse Collection</h2>
+  
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <form method="get" class="d-flex">
+        <input type="text" name="query" class="form-control me-2" placeholder="Search by title or author" value="{{ request.GET.query|default:'' }}">
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+    </div>
+    <div class="col-md-6 text-md-end">
+      {% if request.GET.query %}
+        <a href="{% url 'catalog:work_list' %}" class="btn btn-outline-secondary">Clear Search</a>
+      {% endif %}
+    </div>
+  </div>
+  
+  {% if works %}
+    <div class="row">
+      {% for work in works %}
+        <div class="col-md-4 mb-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">{{ work.title }}</h5>
+              <h6 class="card-subtitle mb-2 text-muted">
+                {% for author in work.authors.all %}
+                  {{ author.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+              </h6>
+              <p class="card-text">Published: {{ work.publication_year }}</p>
+              {% if work.available %}
+                <span class="badge bg-success">Available</span>
+              {% else %}
+                <span class="badge bg-danger">On Loan</span>
+              {% endif %}
+            </div>
+            <div class="card-footer">
+              <a href="{% url 'catalog:work_detail' work.id %}" class="btn btn-primary">View Details</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">
+      No works found matching your search criteria.
+    </div>
+  {% endif %}
+{% endblock %}

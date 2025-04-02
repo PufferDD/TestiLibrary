@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ work.title }}{% endblock %}
+
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'catalog:home' %}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'catalog:work_list' %}">Works</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ work.title }}</li>
+    </ol>
+  </nav>
+
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h2>{{ work.title }}</h2>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-8">
+          <h5>Details</h5>
+          <dl class="row">
+            <dt class="col-sm-3">Authors</dt>
+            <dd class="col-sm-9">
+              {% for author in work.authors.all %}
+                {{ author.name }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </dd>
+            
+            <dt class="col-sm-3">Publication Year</dt>
+            <dd class="col-sm-9">{{ work.publication_year }}</dd>
+            
+            <dt class="col-sm-3">Status</dt>
+            <dd class="col-sm-9">
+              {% if work.available %}
+                <span class="badge bg-success">Available</span>
+              {% else %}
+                <span class="badge bg-danger">On Loan</span>
+              {% endif %}
+            </dd>
+          </dl>
+        </div>
+      </div>
+      
+      {% if user.is_authenticated and work.available %}
+        <a href="{% url 'catalog:borrow_work' work.id %}" class="btn btn-success">Borrow This Work</a>
+      {% elif not user.is_authenticated %}
+        <div class="alert alert-info">
+          <a href="{% url 'accounts:login' %}">Login</a> to borrow this work.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
